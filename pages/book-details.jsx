@@ -2,13 +2,18 @@ const { useState, useEffect} = React
 const { useParams, useNavigate, Link } = ReactRouterDOM
 
 import {bookService} from '../services/book.service.js'
+import { utilService } from '../services/util.service.js'
 
 import { LongText } from "../cmps/long-txt.jsx"
+import { AddReview } from '../cmps/add-review.jsx'
+import { showSuccessMsg } from "../services/event-bus.service.js"
+import { ShowReview } from '../cmps/show-review.jsx'
 
 export function BookDetails() {
     const [book, setBook] = useState(null)
     const { bookId } = useParams()
     const navigate = useNavigate()
+    const [reviews, setReviews] = useState()
     
     useEffect(() => {
         loadBook()
@@ -16,7 +21,10 @@ export function BookDetails() {
 
     function loadBook() {
         bookService.get(bookId)
-            .then(setBook)
+            .then(book => {
+                setBook(book)
+                setReviews(book.reviews)
+            })
             .catch(err => {console.log('Had issues with book details', err)})
     }
 
@@ -24,6 +32,24 @@ export function BookDetails() {
         navigate('/book')
     }
     
+    function onAddReview(review) {
+        review.id = utilService.makeId()
+        bookService.addReview(bookId, review).then(() => {
+            const updatedReviews = [review,...reviews]
+            setReviews(updatedReviews)
+            showSuccessMsg('Review added successfully')
+        })
+    }
+
+    function onRemoveReview(reviewId) {
+        bookService.removeReview(bookId, reviewId).then(() => {
+            const updatedReviews = reviews.filter(review => review.id !== reviewId)
+            setReviews(updatedReviews)
+            showSuccessMsg('Review deleted successfully')
+        })
+        
+    }
+
     function calcReading(pageCount) {
         if (pageCount > 500) return 'Searious Reading'
         else if (pageCount > 200) return 'Descent Reading'
@@ -54,5 +80,7 @@ export function BookDetails() {
         <h2 className={`${checkPrice(book.listPrice.amount)}`}>{book.listPrice.amount}{book.listPrice.currencyCode}</h2>
         <LongText txt={book.description} />
         <button onClick={onGoBack}>Go Back</button>
+        <AddReview bookId={bookId} onAddReview={onAddReview} />
+        <ShowReview reviews={reviews} onRemoveReview={onRemoveReview} />
     </section>
 }

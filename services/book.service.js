@@ -4,8 +4,11 @@ import { storageService } from "./async-storage.service.js"
 export const bookService = {
     query,
     getDefaultFilter,
+    getEmptyBook,
     get,
-    remove
+    remove,
+    addReview,
+    removeReview
 }
 
 const BOOK_KEY = 'bookDB'
@@ -34,8 +37,44 @@ function remove(bookId) {
     return storageService.remove(BOOK_KEY, bookId)
 }
 
+function addReview(bookId, review) {
+    return get(bookId).then(book => {
+        if (!book.reviews) book.reviews = [review]
+        else book.reviews.unshift(review)
+        storageService.put(BOOK_KEY,book)
+    })
+}
+
+function removeReview(bookId, reviewId) {
+    return get(bookId).then(book => {
+        const reviewIdx = book.reviews.find(review => review.id === reviewId)
+        book.reviews.splice(reviewIdx, 1)
+        storageService.put(BOOK_KEY,book)
+    })
+}
+
 function getDefaultFilter() {
     return {txt: '', maxPrice: ''}
+}
+
+function getEmptyBook() {
+    return {
+        id: null,
+        title: '',
+        subtitle: '',
+        authors: [],
+        publishedDate: '',
+        description: '',
+        pageCount: '',
+        categories: [],
+        thumbnail: '',
+        language: '',
+        listPrice: {
+            amount: '',
+            currencyCode: '',
+            isOnSale: false
+        }
+    }
 }
 
 function _createBooks() {
