@@ -1,0 +1,34 @@
+.book-details {
+    width: 95vh;
+    margin: auto;
+}
+.red {
+    color: red;
+}
+
+.green {
+    color: green;
+}
+
+/* @keyframes onsale {
+    25% {transform: rotate(45);}
+    75% {transform: rotate(-45);}
+} */
+@keyframes onsale {
+    25% {transform: rotateZ(45deg);}
+    75% {transform: rotateZ(-45deg);}
+}
+
+.on-sale {
+    padding: 10px;
+    border-radius: 5px;
+    background: linear-gradient(0deg, rgba(5,69,0,1) 0%, rgba(42,136,0,1) 100%);
+    width:fit-content;
+    color: white;
+    animation-name: onsale;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+}
+
+
+

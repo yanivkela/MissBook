@@ -9,3 +9,16 @@
     color: var(--clr2bg);
   }
 }
+
+.header-container {
+  width: 90vw;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.active {
+  font-weight: bold;
+  color: white;
+}

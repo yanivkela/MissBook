@@ -3,7 +3,9 @@ import { storageService } from "./async-storage.service.js"
 
 export const bookService = {
     query,
-    getDefaultFilter
+    getDefaultFilter,
+    get,
+    remove
 }
 
 const BOOK_KEY = 'bookDB'
@@ -24,6 +26,13 @@ function query(filterBy = getDefaultFilter()) {
     })
 }
 
+function get(bookId) {
+    return storageService.get(BOOK_KEY, bookId)
+}
+
+function remove(bookId) {
+    return storageService.remove(BOOK_KEY, bookId)
+}
 
 function getDefaultFilter() {
     return {txt: '', maxPrice: ''}
@@ -37,7 +46,8 @@ function _createBooks() {
             "title": "metus hendrerit",
             "subtitle": "mi est eros convallis auctor arcu dapibus himenaeos",
             "authors": [
-              "Barbara Cartland"
+              "Barbara Cartland",
+              "Tyler Durden"
             ],
             "publishedDate": 1999,
             "description": "placerat nisi sodales suscipit tellus tincidunt mauris elit sit luctus interdum ad dictum platea vehicula conubia fermentum habitasse congue suspendisse",

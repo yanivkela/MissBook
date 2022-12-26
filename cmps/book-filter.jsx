@@ -27,7 +27,7 @@ export function BookFilter({setFilterBy}) {
             placeholder="Book Title"
             value={filterByToEdit.txt}
             onChange={handleChange} />
-            <label htmlFor="maxPrice">Title:</label>
+            <label htmlFor="maxPrice">Max price:</label>
             <input type="number" 
             id="maxPrice" 
             name="maxPrice"

@@ -1,33 +1,37 @@
 const { useState, useEffect } = React
 
 import { BookList } from "../cmps/book-list.jsx"
-import { BookDetails } from "./book-details.jsx"
 import { BookFilter } from "../cmps/book-filter.jsx"
 
 import { bookService } from "../services/book.service.js"
+import { showSuccessMsg } from "../services/event-bus.service.js"
 
 export function BookIndex() {
     const [filterBy, setFilterBy] = useState(bookService.getDefaultFilter())
     const [books, setBooks] = useState([])
-    const [selectedBook, setSelectedBook] = useState(null)
+    const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
-        bookService.query(filterBy).then(setBooks)
+        setIsLoading(true)
+        bookService.query(filterBy).then(books => {
+            setBooks(books)
+            setIsLoading(false)
+        })
     },[filterBy])
 
-    function onSelectBook(bookId) {
-        bookService.query().then(books => {
-            const book = books.find(book => book.id === bookId)
-            setSelectedBook(book)
+
+    function onRemoveBook(bookId) {
+        bookService.remove(bookId).then(() => {
+            const updatedBooks = books.filter(book => book.id !== bookId)
+            setBooks(updatedBooks)
+            showSuccessMsg('Book deleted successfully')
         })
-    }
-    function onGoBack() {
-        setSelectedBook(null)
     }
 
     return <section>
         <BookFilter setFilterBy={setFilterBy} />
-        {!selectedBook && < BookList books={books} onSelectBook={onSelectBook} />}
-        {selectedBook && <BookDetails book={selectedBook} onGoBack={onGoBack} />}
+        {!isLoading && < BookList books={books} onRemoveBook={onRemoveBook} />}
+        {isLoading && <div>Loading...</div>}
+        {!books.length && <div>No items to show.</div>}
     </section>
 }
