@@ -9,7 +9,8 @@ export const bookService = {
     save,
     remove,
     addReview,
-    removeReview
+    removeReview,
+    addGoogleBook
 }
 
 const BOOK_KEY = 'bookDB'
@@ -42,6 +43,32 @@ function save(book) {
     if (!book.thumbnail) book.thumbnail = '../assets/img/default.jpg'
     if (!book.id) return storageService.post(BOOK_KEY, book)
     else  return storageService.put(BOOK_KEY, book)
+}
+
+function addGoogleBook(book) {
+    const formattedBook = {
+        id: book.id,
+        title: book.volumeInfo.title,
+        subtitle: book.volumeInfo.subtitle || '',
+        authors: book.volumeInfo.authors,
+        publishedDate: book.volumeInfo.publishedDate.split('-')[0],
+        description: book.volumeInfo.description,
+        pageCount: book.volumeInfo.pageCount,
+        categories: book.volumeInfo.categories,
+        thumbnail: book.volumeInfo.imageLinks.thumbnail,
+        language: book.volumeInfo.language,
+        listPrice: {
+            amount: utilService.getRandomIntInclusive(60,200),
+            currencyCode: 'EUR',
+            isOnSale: Math.random > 0.5 ? true : false
+        }
+    }
+    return query().then(books => {
+        books.push(formattedBook)
+        utilService.saveToStorage(BOOK_KEY, books)
+    }).then(() => {
+        return formattedBook
+    } )
 }
 
 function addReview(bookId, review) {
