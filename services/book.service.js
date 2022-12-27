@@ -6,6 +6,7 @@ export const bookService = {
     getDefaultFilter,
     getEmptyBook,
     get,
+    save,
     remove,
     addReview,
     removeReview
@@ -35,6 +36,12 @@ function get(bookId) {
 
 function remove(bookId) {
     return storageService.remove(BOOK_KEY, bookId)
+}
+
+function save(book) {
+    if (!book.thumbnail) book.thumbnail = '../assets/img/default.jpg'
+    if (!book.id) return storageService.post(BOOK_KEY, book)
+    else  return storageService.put(BOOK_KEY, book)
 }
 
 function addReview(bookId, review) {

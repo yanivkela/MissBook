@@ -10,6 +10,17 @@
     color: green;
 }
 
+.neighbor-book {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    color: gray
+}
+
+.neighbor-book a {
+    color: black;
+}
+
 /* @keyframes onsale {
     25% {transform: rotate(45);}
     75% {transform: rotate(-45);}

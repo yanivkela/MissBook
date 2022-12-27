@@ -12,12 +12,14 @@ import { ShowReview } from '../cmps/show-review.jsx'
 export function BookDetails() {
     const [book, setBook] = useState(null)
     const { bookId } = useParams()
-    const navigate = useNavigate()
     const [reviews, setReviews] = useState()
+    const [neighborsId, setNeighborsId] = useState({prevBookId: null, nextBookId: null})
+    const navigate = useNavigate()
     
     useEffect(() => {
         loadBook()
-    },[])
+        getNeighbors(bookId)
+    },[bookId])
 
     function loadBook() {
         bookService.get(bookId)
@@ -26,6 +28,30 @@ export function BookDetails() {
                 setReviews(book.reviews)
             })
             .catch(err => {console.log('Had issues with book details', err)})
+    }
+
+    function getNeighbors(bookId) {
+        bookService.query().then(books => {
+            const currBookIdx = books.findIndex(book => book.id === bookId)
+            if (currBookIdx !== 0) {
+                setNeighborsId(prevState => {
+                    return {...prevState, prevBookId: books[currBookIdx-1].id}
+                })
+            } else {
+                setNeighborsId(prevState => {
+                    return {...prevState, prevBookId: null}
+                })
+            }
+            if (currBookIdx !== books.length - 1) {
+                setNeighborsId(prevState => {
+                    return {...prevState, nextBookId:books[currBookIdx+1].id}
+                })
+            } else {
+                setNeighborsId(prevState => {
+                    return {...prevState, nextBookId: null}
+                })
+            }
+        })
     }
 
     function onGoBack() {
@@ -69,8 +95,14 @@ export function BookDetails() {
     }
     if (!book) return 'Loading...'
     return <section className="book-details">
+        <div className="neighbor-book">
+            {neighborsId.prevBookId ? <Link to={`/book/${neighborsId.prevBookId}`}>{'< Previous book'}</Link> : <span>{'< Previous book'}</span>}
+            {neighborsId.nextBookId ? <Link to={`/book/${neighborsId.nextBookId}`}>{'Next book >'} </Link> : <span>{'Next book >'}</span>}
+        </div>
         <h1>{book.title}</h1>
         <h2>{book.subtitle}</h2>
+        <Link to={`/book/edit/${book.id}`}>Edit</Link>
+        <br />
         <img src={book.thumbnail} />
         {book.authors.length === 1 && <h3>Author: {book.authors[0]}</h3>}
         {book.authors.length !== 1 && <h3>Authors: <ul>{book.authors.map(author => <li key={author}>{author}</li>)}</ul></h3>}
